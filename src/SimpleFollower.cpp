@@ -281,9 +281,16 @@ void SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goa
 #endif
   if(distance <= goal.distanceTolerance) {
 
-    while(deltaPose > +M_PI) deltaPose -= 2 * M_PI;
-    while(deltaPose < -M_PI) deltaPose += 2 * M_PI;
-				
+    //while(deltaPose > +M_PI) deltaPose -= 2 * M_PI;
+    //while(deltaPose < -M_PI) deltaPose += 2 * M_PI;
+	deltaPose += 180;
+	fmod(deltaPose, 360);
+	if (deltaPose < 0) {
+	  deltaPose += 180;
+	} else {
+	  deltaPose -= 180;
+	}
+			
     transVelocity = 0;
     if(fabs(deltaPose) < goal.headingTolerance) {
       rotVelocity = 0;

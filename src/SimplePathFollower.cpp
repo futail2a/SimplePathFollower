@@ -143,6 +143,8 @@ RTC::ReturnCode_t SimplePathFollower::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t SimplePathFollower::onDeactivated(RTC::UniqueId ec_id)
 {
   m_pathFollowerObj.stopFollow();
+  m_pathFollowerObj.getTargetVelocity(m_velocity.data);
+  m_velocityOut.write();
   return RTC::RTC_OK;
 }
 
