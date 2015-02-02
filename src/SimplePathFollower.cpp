@@ -103,6 +103,7 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
   bindParameter("approachDistanceGain", m_approachDistanceGain, "1.0");
   bindParameter("poseTimeout", m_poseTimeout, "3.0");
   // </rtc-template>
+  m_pathFollowerObj.stopFollow();
   
   return RTC::RTC_OK;
 }
@@ -131,6 +132,7 @@ RTC::ReturnCode_t SimplePathFollower::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SimplePathFollower::onActivated(RTC::UniqueId ec_id)
 {
+  m_pathFollowerObj.stopFollow();
   m_poseUpdated = FALSE;
   m_Mode = MODE_NORMAL;
   m_lastReceivedTime = coil::gettimeofday();
@@ -140,6 +142,7 @@ RTC::ReturnCode_t SimplePathFollower::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SimplePathFollower::onDeactivated(RTC::UniqueId ec_id)
 {
+  m_pathFollowerObj.stopFollow();
   return RTC::RTC_OK;
 }
 
