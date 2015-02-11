@@ -36,16 +36,16 @@ RTC::RETURN_VALUE PathFollowerSVC_impl::followPath(const RTC::Path2D& path)
   m_pRTC->setPath(path);
   m_pRTC->startFollow();
 
-  /*
+  
   while(!m_pRTC->isGoal()) {
     coil::usleep(1000*100);
 
     if (m_pRTC->getMode() == MODE_TIMEOUT) {
-      //return RTC::RETVAL_TIMEOUT;
+      return RTC::RETVAL_CURRENT_POSE_TIME_OUT;
       return result;
     }
   }
-  */
+  
   
   return result;
 }
