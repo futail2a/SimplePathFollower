@@ -68,7 +68,6 @@ void SimpleFollower::startFollow(Path2D& path)
   m_targetPath = path;
   m_following = true;
   m_StartPointIndex = 0;
-  this->m_goal = false;
 #ifdef DEBUG
   fout.open("log.csv");
 #endif
@@ -326,8 +325,7 @@ FOLLOW_RESULT SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoi
   if(distance <= goal.distanceTolerance) {
 
     transVelocity = 0;
-    //if(fabs(deltaPose) < goal.headingTolerance) {
-	if (true) {
+		if(fabs(deltaPose) < goal.headingTolerance) {
       rotVelocity = 0;
 			m_goal = true;
 #ifdef DEBUG

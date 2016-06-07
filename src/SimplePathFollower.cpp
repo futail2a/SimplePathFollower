@@ -104,7 +104,6 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
   bindParameter("approachDistanceGain", m_approachDistanceGain, "1.0");
   bindParameter("poseTimeout", m_poseTimeout, "3.0");
   // </rtc-template>
-  m_pathFollowerObj.stopFollow();
   
   return RTC::RTC_OK;
 }
@@ -133,7 +132,6 @@ RTC::ReturnCode_t SimplePathFollower::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SimplePathFollower::onActivated(RTC::UniqueId ec_id)
 {
-  m
 	m_poseUpdated = false;
   m_Mode = MODE_NORMAL;
 	m_pathFollowerObj.stopFollow();
@@ -144,9 +142,6 @@ RTC::ReturnCode_t SimplePathFollower::onActivated(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t SimplePathFollower::onDeactivated(RTC::UniqueId ec_id)
 {
-  m_pathFollowerObj.stopFollow();
-  m_pathFollowerObj.getTargetVelocity(m_velocity.data);
-  m_velocityOut.write();
   return RTC::RTC_OK;
 }
 

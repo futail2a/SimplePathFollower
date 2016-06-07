@@ -42,7 +42,6 @@ RTC::RETURN_VALUE PathFollowerSVC_impl::followPath(const RTC::Path2D& path)
   m_pRTC->startFollow();
 		std::cout << "[RTC::SimplePathFollower] Start Following" << std::endl;
 
-  
   while(!m_pRTC->isGoal()) {
     coil::usleep(1000*100);
 
