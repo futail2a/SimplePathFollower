@@ -39,6 +39,8 @@ using namespace RTC;
 enum SIMPLE_PATH_FOLLOWER_MODE {
   MODE_NORMAL,
   MODE_TIMEOUT,
+  MODE_OUTOFRANGE,
+  MODE_GOALED,
 };
 
 
@@ -364,6 +366,10 @@ public:
 
   void startFollow() {
     m_pathFollowerObj.startFollow(m_path);
+  }
+
+  void stopFollow() {
+	  m_pathFollowerObj.stopFollow();
   }
 
   void setPath(const RTC::Path2D& path) {

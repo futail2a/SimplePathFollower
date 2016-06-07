@@ -1,6 +1,17 @@
 #pragma once
 
 
+enum FOLLOW_RESULT {
+	FOLLOW_OK,
+	FOLLOW_DISTANCEOUTOFRANGE,
+	FOLLOW_HEADINGOUTOFRANGE,
+	FOLLOW_NOT_IN_FOLLOW,
+
+	FOLLOW_APPROACHINGTOGOAL,
+	FOLLOW_TURNTOGOALPOSE,
+	FOLLOW_GOAL,
+};
+
 class SimpleFollower {
  private:
   float m_distanceToTranslationGain;
@@ -12,7 +23,10 @@ class SimpleFollower {
 
   float m_MaxTranslationVelocity;
   float m_MinTranslationVelocity;
+  float m_MaxRotationVelocity;
+  float m_MinRotationVelocity;
   bool m_following;
+  bool m_approaching;
   bool m_goal;
   
   int m_StartPointIndex;
@@ -25,9 +39,13 @@ class SimpleFollower {
   int getStopPointIndex() {return m_StartPointIndex+1;}
 
  public:
-  SimpleFollower(float maxTranslationVelocity=0.5, float minTranslationVelocity=0.2, float distanceToTranslationGain=2.0, float directionToTranslationGain=2.0, float distanceToRotationGain=2.5, float directionToRotationGain=2.5, float approachDistanceGain=0.5, float approachDirectionGain=0.5);
+  SimpleFollower(float maxTranslationVelocity=0.5, float minTranslationVelocity=0.2, 
+	  float maxRotationVelocity=0.5, float minRotationVelocity=0.2,
+	  float distanceToTranslationGain=2.0, float directionToTranslationGain=2.0, float distanceToRotationGain=2.5, float directionToRotationGain=2.5, float approachDistanceGain=0.5, float approachDirectionGain=0.5);
 
-  void setGain(float maxTranslationVelocity=0.5, float minTranslationVelocity=0.2, float distanceToTranslationGain=2.0, float directionToTranslationGain=2.0, float distanceToRotationGain=2.5, float directionToRotationGain=2.5, float approachDistanceGain=0.5, float approachDirectionGain=0.5);
+  void setGain(float maxTranslationVelocity=0.5, float minTranslationVelocity=0.2,
+	  float maxRotationVelocity=0.5, float minRotationVelocity=0.2,
+	  float distanceToTranslationGain=2.0, float directionToTranslationGain=2.0, float distanceToRotationGain=2.5, float directionToRotationGain=2.5, float approachDistanceGain=0.5, float approachDirectionGain=0.5);
 
   ~SimpleFollower();
   
@@ -39,9 +57,9 @@ class SimpleFollower {
 
   void setCurrentPose(RTC::Pose2D& pose) { m_currentPose = pose; }
   
-  void follow();
+  FOLLOW_RESULT follow();
 
-  void approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goal);
+  FOLLOW_RESULT approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goal);
   void getTargetVelocity(RTC::Velocity2D& velocity) {
     velocity = m_targetVelocity;
   }
@@ -51,7 +69,7 @@ class SimpleFollower {
   }
 
  private:
-  void SimpleFollower::updateReferenceLine();
+  void updateReferenceLine();
 
 
 };

@@ -33,23 +33,57 @@ RTC::RETURN_VALUE PathFollowerSVC_impl::followPath(const RTC::Path2D& path)
   // Please insert your code here and remove the following warning pragma
 
   
+	if(path.waypoints.length() == 0){ 
+		m_pRTC->stopFollow();
+		std::cout << "[RTC::SimplePathFollower] Stop Following" << std::endl;
+
+	} else {
   m_pRTC->setPath(path);
   m_pRTC->startFollow();
+		std::cout << "[RTC::SimplePathFollower] Start Following" << std::endl;
 
   
   while(!m_pRTC->isGoal()) {
     coil::usleep(1000*100);
 
     if (m_pRTC->getMode() == MODE_TIMEOUT) {
-      return RTC::RETVAL_CURRENT_POSE_TIME_OUT;
+				std::cout << "[RTC::SimplePathFollower] Current Pose Timeout" << std::endl;
+				return RTC::RETVAL_ODOMETRY_TIME_OUT;
+			} else if (m_pRTC->getMode() == MODE_OUTOFRANGE) {
+				std::cout << "[RTC::SimplePathFollower] OutOfRange" << std::endl;
+				return RTC::RETVAL_OUTOF_RANGE;
+			}
+
+		}
+
+		std::cout << "[RTC::SimplePathFollower] Goal Reached." << std::endl;
+	}
+
       return result;
     }
+
+RTC::RETURN_VALUE PathFollowerSVC_impl::getState(::RTC::FOLLOWER_STATE& state)
+{
+	RTC::RETURN_VALUE result = RETVAL_OK;
+
+
+	return result;
   }
   
+RTC::RETURN_VALUE PathFollowerSVC_impl::followPathNonBlock(const ::RTC::Path2D& path)
+{
+	RTC::RETURN_VALUE result = RETVAL_OK;
   
+	if(path.waypoints.length() == 0){ 
+		m_pRTC->stopFollow();
+	} else {
+		m_pRTC->setPath(path);
+		m_pRTC->startFollow();
+		std::cout << "[RTC::SimplePathFollower] Start Following" << std::endl;
+	}
+
   return result;
 }
-
 
 
 // End of example implementational code

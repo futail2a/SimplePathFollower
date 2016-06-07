@@ -13,7 +13,7 @@
 
 using namespace RTC;
 
-
+#define DEBUG
 
 
 #ifdef DEBUG
@@ -21,15 +21,28 @@ using namespace RTC;
 #include <fstream>
 #endif
 
-SimpleFollower::SimpleFollower(float maxTranslationVelocity, float minTranslationVelocity, float distanceToTranslationGain, float directionToTranslationGain, float distanceToRotationGain, float directionToRotationGain, float approachDistanceGain, float approachDirectionGain)
+SimpleFollower::SimpleFollower(float maxTranslationVelocity,
+	float minTranslationVelocity, 
+	float maxRotationVelocity,
+	float minRotationVelocity,
+	float distanceToTranslationGain, 
+	float directionToTranslationGain,
+	float distanceToRotationGain,
+	float directionToRotationGain,
+	float approachDistanceGain,
+	float approachDirectionGain)
 {
-	setGain(maxTranslationVelocity, minTranslationVelocity, distanceToTranslationGain, directionToTranslationGain,
+	setGain(maxTranslationVelocity, minTranslationVelocity, maxRotationVelocity, minRotationVelocity, distanceToTranslationGain, directionToTranslationGain,
 		distanceToRotationGain, directionToRotationGain, approachDistanceGain, approachDirectionGain);
 }
 
-void SimpleFollower::setGain(float maxTranslationVelocity, float minTranslationVelocity, float distanceToTranslationGain, float directionToTranslationGain, float distanceToRotationGain, float directionToRotationGain, float approachDistanceGain, float approachDirectionGain) {
+void SimpleFollower::setGain(float maxTranslationVelocity, float minTranslationVelocity, 
+	float maxRotationVelocity, float minRotationVelocity, 
+	float distanceToTranslationGain, float directionToTranslationGain, float distanceToRotationGain, float directionToRotationGain, float approachDistanceGain, float approachDirectionGain) {
   m_MaxTranslationVelocity = maxTranslationVelocity;
   m_MinTranslationVelocity = minTranslationVelocity;
+		m_MaxRotationVelocity = maxRotationVelocity;
+		m_MinRotationVelocity = minRotationVelocity;
   m_distanceToTranslationGain = distanceToTranslationGain;
   m_directionToTranslationGain = directionToTranslationGain;
   m_distanceToRotationGain = distanceToRotationGain;
@@ -50,7 +63,8 @@ static std::ofstream fout;
 
 void SimpleFollower::startFollow(Path2D& path)
 {
-
+	m_goal = false;
+	m_approaching = false;
   m_targetPath = path;
   m_following = true;
   m_StartPointIndex = 0;
@@ -171,21 +185,10 @@ void SimpleFollower::updateReferenceLine() {
 	startIndex = index;
 	stopIndex = index+1;
       } else { 
-	/*
-	  double d1 = getDistance(pose, path.waypoints[index-1].target);
-	  double d2 = getDistance(pose, path.waypoints[index+1].target);
-	  if (d1 > d2) {
-	  startIndex = index;
-	  stopIndex = index+1;
-	  } else {
 	  startIndex = index-1;
 	  stopIndex = index;
 	  }
-	*/
-	startIndex = index-1;
-	stopIndex = index;
       }
-    }
     m_StartPointIndex = startIndex;
   }
 
@@ -212,14 +215,12 @@ void SimpleFollower::updateReferenceLine() {
 			   
 
 
-void SimpleFollower::follow()
+FOLLOW_RESULT SimpleFollower::follow()
 {
   if(!isFollowing()) {
     m_targetVelocity.vx = m_targetVelocity.vy = m_targetVelocity.va = 0;
-    return;
+		return FOLLOW_NOT_IN_FOLLOW;
   }
-
-
 
   updateReferenceLine();
   int startIndex = getStartPointIndex();
@@ -227,23 +228,55 @@ void SimpleFollower::follow()
   RTC::Waypoint2D startPoint = m_targetPath.waypoints[startIndex];
   RTC::Waypoint2D stopPoint = m_targetPath.waypoints[stopIndex];
 
+
+	double maxTranslationVelocity = stopPoint.maxSpeed.vx;
+	double maxRotationVelocity = stopPoint.maxSpeed.va;
+
   int nearestIndex = getNearestIndex(m_currentPose, m_targetPath);
-  if (nearestIndex == (m_targetPath.waypoints.length() -1 )) {
+	if (nearestIndex == (m_targetPath.waypoints.length() -1 ) || m_approaching) {
 #ifdef DEBUG
     std::cout << "[SimpleFollower] Approaching Goal." << std::endl;
 #endif
-    approachGoal(m_currentPose, stopPoint);
-    return ;
+		m_approaching = true;
+		return approachGoal(m_currentPose, m_targetPath.waypoints[m_targetPath.waypoints.length()-1]);
   }
 
+	double distanceFromPath = getDistanceFromPath(startPoint, stopPoint, m_currentPose);
+	if(fabs(distanceFromPath) > stopPoint.distanceTolerance) { // Out of Range
+#ifdef DEBUG
+		std::cout << "[SimpleFollower] Distance Out Of Range (now=" << fabs(distanceFromPath) << " range=" << stopPoint.distanceTolerance << ")" << std::endl;
+#endif
+		//throw OutOfRangeException();
+		return FOLLOW_DISTANCEOUTOFRANGE;
+	}
  
-
-  double distanceFromPath = getDistanceFromPath(startPoint, stopPoint, m_currentPose);
   double angularDistanceFromPath = getAngularDistanceFromPath(startPoint, stopPoint, m_currentPose);
   
   //  distanceFromPath = 0.1;
+	m_targetVelocity.vx = 0;
 
   m_targetVelocity.va = -(m_distanceToRotationGain * distanceFromPath + m_directionToRotationGain * angularDistanceFromPath);
+	if(m_targetVelocity.va > maxRotationVelocity) {
+		m_targetVelocity.va = maxRotationVelocity;
+	} else if(m_targetVelocity.va < -maxRotationVelocity) {
+		m_targetVelocity.va = -maxRotationVelocity;
+	}  
+
+	// 角度誤差が許容差以上だったら，旋回速度計算が終了時点で例外を出す．並進速度はゼロ
+	if(fabs(angularDistanceFromPath) > stopPoint.headingTolerance) {
+#ifdef DEBUG
+		std::cout << "[SimpleFollower] Heading Out Of Range (now=" << fabs(angularDistanceFromPath) << " range=" << stopPoint.headingTolerance << ")" << std::endl;
+#endif
+		if (fabs(m_targetVelocity.va) < m_MinRotationVelocity) {
+			if (m_targetVelocity.va < 0) m_targetVelocity.va = -m_MinRotationVelocity;
+			else if(m_targetVelocity.va > 0) m_targetVelocity.va = m_MinRotationVelocity;
+		}
+		//throw HeadingOutOfRangeException();
+		return FOLLOW_HEADINGOUTOFRANGE;
+	}
+
+
+
   m_targetVelocity.vx = m_MaxTranslationVelocity - m_distanceToTranslationGain * fabs(distanceFromPath)
     - m_directionToTranslationGain * fabs(angularDistanceFromPath);
   if(m_targetVelocity.vx < m_MinTranslationVelocity) {
@@ -262,11 +295,17 @@ void SimpleFollower::follow()
 	    << m_targetVelocity.vx << ", " << m_targetVelocity.va << "]" << std::endl;
 #endif
 
+	return FOLLOW_OK;
 }
 
 
-void SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goal)
+FOLLOW_RESULT SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goal)
 {
+
+	RTC::Path2D& path = m_targetPath;
+	int index = getStopPointIndex();
+	//  RTC::Waypoint2D& goal = path.waypoints[index];
+
   double transVelocity = 0;
   double rotVelocity = 0;
   int length = m_targetPath.waypoints.length();
@@ -274,32 +313,27 @@ void SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goa
   double dy = goal.target.position.y - currentPose.position.y;
   double distance = sqrt(dx*dx + dy*dy);
   double deltaPose = goal.target.heading - currentPose.heading;
+	while(deltaPose > +M_PI) deltaPose -= 2 * M_PI;
+	while(deltaPose < -M_PI) deltaPose += 2 * M_PI;
 
-#ifdef DEBUG
-  std::cout << "[SimpleFollower] Goal = " << goal.target.position.x << ", " << goal.target.position.y << std::endl;
+	FOLLOW_RESULT ret = FOLLOW_APPROACHINGTOGOAL;
+#ifdef DEBUG_GOAL
+	std::cout << "[SimpleFollower] Goal = " << goal.target.position.x << ", " << goal.target.position.y << ", " << goal.target.heading << std::endl;
+	std::cout << "[SimpleFollower] Curr = " << currentPose.position.x << ", " << currentPose.position.y << ", " << currentPose.heading << std::endl;
   std::cout << "[SimpleFollower] Distance = " << distance << ", Direction = " << deltaPose <<  std::endl;
 
 #endif
   if(distance <= goal.distanceTolerance) {
 
-    //while(deltaPose > +M_PI) deltaPose -= 2 * M_PI;
-    //while(deltaPose < -M_PI) deltaPose += 2 * M_PI;
-	deltaPose += 180;
-	fmod(deltaPose, 360);
-	if (deltaPose < 0) {
-	  deltaPose += 180;
-	} else {
-	  deltaPose -= 180;
-	}
-			
     transVelocity = 0;
     //if(fabs(deltaPose) < goal.headingTolerance) {
 	if (true) {
       rotVelocity = 0;
-      m_goal = TRUE;
+			m_goal = true;
 #ifdef DEBUG
       fout.close();
 #endif
+			ret = FOLLOW_GOAL;
     } else {
     //m_Settled = true;
 
@@ -309,6 +343,7 @@ void SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goa
       rotVelocity = m_MaxRotationSpeed;
     }
     */
+			ret = FOLLOW_TURNTOGOALPOSE;
     }
 
   } else {
@@ -325,6 +360,13 @@ void SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goa
     */
     //if(dtheta > PI/6 || dtheta < -PI/6) transVelocity = 0;
     
+		if (dtheta < -goal.headingTolerance) {
+			transVelocity = 0;//m_MinTranslationVelocity;
+		} else if(dtheta > goal.headingTolerance) {
+			transVelocity = 0;//m_MinTranslationVelocity;
+		}
+
+
     rotVelocity = m_approachDirectionGain * (dtheta/(M_PI/2));
     /*
     if(rotVelocity >= m_MaxRotationSpeed) {
@@ -350,4 +392,9 @@ void SimpleFollower::approachGoal(RTC::Pose2D& currentPose, RTC::Waypoint2D& goa
   m_targetVelocity.vx = transVelocity;
   m_targetVelocity.vy = 0;
   m_targetVelocity.va = rotVelocity;
+
+#ifdef DEBUG_GOAL
+	std::cout << "[SimpleFollower] Vel  = " << m_targetVelocity.vx << ", " << m_targetVelocity.vy << ", " << m_targetVelocity.va << std::endl;
+#endif
+	return ret;
 }

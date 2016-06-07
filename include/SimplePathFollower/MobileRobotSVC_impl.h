@@ -43,7 +43,10 @@ class PathFollowerSVC_impl
    // attributes and operations
    RTC::RETURN_VALUE followPath(const RTC::Path2D& path);
 
-   
+   RTC::RETURN_VALUE getState(::RTC::FOLLOWER_STATE& state);
+
+   RTC::RETURN_VALUE followPathNonBlock(const ::RTC::Path2D& path);
+
    void setRTC(SimplePathFollower* pRTC) {
 	 m_pRTC = pRTC;
    }
