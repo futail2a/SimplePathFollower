@@ -256,6 +256,18 @@ return RTC::RTC_OK;
 */
 
 
+void update_conf(param, new_val)
+{
+	cmd = "rtconf localhost/SimplePathFollower0.rtc set" + param + " " + str(nwe_val);
+	p = Popen(cmd, shell=True, stdout=PIPE);
+	while(true){
+        	line = p.stdout.readline();
+        	if(line!){
+            		break;
+		}
+        	std::cout << line.rstrip() << std::endl;
+	}
+}
 
 extern "C"
 {
