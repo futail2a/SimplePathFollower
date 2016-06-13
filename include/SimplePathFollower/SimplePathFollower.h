@@ -362,6 +362,8 @@ class SimplePathFollower
   bool m_poseUpdated;
   SimpleFollower m_pathFollowerObj;
 
+  void update_conf(std::string param, std::string new_val);
+
 public:
 
   void startFollow() {
