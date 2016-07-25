@@ -91,17 +91,18 @@ PortDecorator::~PortDecorator(){}
 
 void PortDecorator::refleshArgs(){
 	//not implemented yet
-	std::cout << "test decorator" << std::endl;
+	std::cout << "decorator test" << std::endl;
 }
 
 RTC::RETURN_VALUE PortDecorator::followPath(const RTC::Path2D& path)
 {
 	m_path = path;
-	pPathFollowerSVC_impl->followPath(m_path);
+	RTC::RETURN_VALUE ret;
+	ret = pPathFollowerSVC_impl->followPath(m_path);
 	//while(pPathFollowerSVC_impl->followPath(m_path) != RTC::RETVAL_OK){
 		refleshArgs();
 	//}
-	return RTC::RETVAL_OK;
+	return ret;
 }
 
 RTC::RETURN_VALUE PortDecorator::getState(::RTC::FOLLOWER_STATE& state)
@@ -114,6 +115,10 @@ RTC::RETURN_VALUE PortDecorator::followPathNonBlock(const ::RTC::Path2D& path)
 {
 	m_path = path;
 	return pPathFollowerSVC_impl->followPathNonBlock(m_path);
+}
+
+void PortDecorator::setRTC(SimplePathFollower* pRTC) {
+	pPathFollowerSVC_impl->setRTC(pRTC);
 }
 
 // End of example implementational code

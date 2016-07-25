@@ -87,7 +87,7 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
 
 	// Set CORBA Service Ports
 	addPort(m_PathFollowerPort);
-	m_pathFollower.setRTC(this);
+	m_portDecorator.setRTC(this);
 
 	// </rtc-template>
 
