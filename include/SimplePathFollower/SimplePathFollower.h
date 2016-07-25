@@ -342,7 +342,9 @@ class SimplePathFollower
   /*!
    */
   PathFollowerSVC_impl m_pathFollower;
-  
+
+  PortDecorator m_portDecorator;
+
   // </rtc-template>
 
   // Consumer declaration

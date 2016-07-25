@@ -81,7 +81,7 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
 	addOutPort("velocity", m_velocityOut);
 
 	// Set service provider to Ports
-	m_PathFollowerPort.registerProvider("PathFollower", "RTC::PathFollower", m_pathFollower);
+	m_PathFollowerPort.registerProvider("PathFollower", "RTC::PathFollower", m_portDecorator);
 
 	// Set service consumers to Ports
 
