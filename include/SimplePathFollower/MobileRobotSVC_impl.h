@@ -51,6 +51,8 @@ class PathFollowerSVC_impl
 	 m_pRTC = pRTC;
    }
 
+   virtual RTC::Path2D refleshArgs();
+
 };
 
 class PortDecorator : public PathFollowerSVC_impl{
@@ -63,7 +65,6 @@ public :
 	PortDecorator();
 	~PortDecorator();
 
-   virtual void refleshArgs();
 	 	
    RTC::RETURN_VALUE followPath(const RTC::Path2D& path);
 

@@ -255,6 +255,11 @@ return RTC::RTC_OK;
 }
 */
 
+RTC::Path2D refleshPath(){
+	RTC::Path2D path;
+	return path;
+}
+
 
 void update_conf(std::string param, std::string new_val)
 {

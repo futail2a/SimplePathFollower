@@ -384,12 +384,14 @@ public:
 
   SIMPLE_PATH_FOLLOWER_MODE m_Mode;
 
-public:
   SIMPLE_PATH_FOLLOWER_MODE getMode() {return m_Mode;}
 
   bool isGoal() {
     return m_pathFollowerObj.isGoal();
   }
+
+  RTC::Path2D refleshPath();
+
 };
 
 
