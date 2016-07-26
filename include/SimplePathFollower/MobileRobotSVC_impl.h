@@ -71,9 +71,8 @@ public :
 
    RTC::RETURN_VALUE followPathNonBlock(const ::RTC::Path2D& path);
 
-   void setRTC(SimplePathFollower* pRTC) {
-      pPathFollowerSVC_impl->setRTC(pRTC);
-   }
+   void setRTC(SimplePathFollower* pRTC);
+ 
 };
 
 
