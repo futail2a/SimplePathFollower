@@ -255,7 +255,7 @@ return RTC::RTC_OK;
 }
 */
 
-void SimplePathFollower::refleshPath(RTC::Path2D& path){
+void SimplePathFollower::refreshPath(RTC::Path2D& path){
 	//add update logic
 	//path = m_path;
 	std::cout << "test decorator" << std::endl;
