@@ -94,10 +94,10 @@ RTC::RETURN_VALUE PortDecorator::followPath(const RTC::Path2D& path)
 	m_path = path;
 	RTC::RETURN_VALUE ret;
 	ret = pPathFollowerSVC_impl->followPath(m_path);
-	//while(pPathFollowerSVC_impl->followPath(m_path) != RTC::RETVAL_OK){
-	    //std::cout << m_pRTC->isGoal() << std::endl;
+	while(ret != RTC::RETVAL_OK){
 		m_pRTC->refleshPath(m_path);
-	//}
+		ret = pPathFollowerSVC_impl->followPath(m_path);
+	}
 	return ret;
 }
 
