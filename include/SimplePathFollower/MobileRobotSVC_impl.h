@@ -24,7 +24,7 @@ class PathFollowerSVC_impl
  : public virtual POA_RTC::PathFollower,
    public virtual PortableServer::RefCountServantBase
 {
- private:
+ protected:
    // Make sure all instances are built on the heap by making the
    // destructor non-public
    //virtual ~PathFollowerSVC_impl();
@@ -50,9 +50,7 @@ class PathFollowerSVC_impl
    void setRTC(SimplePathFollower* pRTC) {
 	 m_pRTC = pRTC;
    }
-
-   virtual RTC::Path2D refleshArgs();
-
+   
 };
 
 class PortDecorator : public PathFollowerSVC_impl{

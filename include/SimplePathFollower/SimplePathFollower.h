@@ -390,7 +390,7 @@ public:
     return m_pathFollowerObj.isGoal();
   }
 
-  RTC::Path2D refleshPath();
+  void refleshPath(RTC::Path2D& path);
 
 };
 
