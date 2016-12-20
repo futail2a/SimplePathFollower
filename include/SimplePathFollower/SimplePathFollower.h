@@ -296,6 +296,8 @@ class SimplePathFollower
    *
    */
   float m_poseTimeout;
+  std::string m_group_name;
+  int m_priority;
 
   // </rtc-template>
 

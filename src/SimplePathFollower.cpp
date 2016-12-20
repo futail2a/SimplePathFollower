@@ -36,6 +36,8 @@ static const char* simplepathfollower_spec[] =
 	"conf.default.maxVelocity", "0.8",
 	"conf.default.minVelocity", "0.2",
 	"conf.default.poseTimeout", "3.0",
+	"conf.default.group_name", "PathFollowerReps",
+	"conf.default.priority", "1",
 	// Widget
 	"conf.__widget__.debug", "text",
 	"conf.__widget__.directionGain", "text",
@@ -103,6 +105,10 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
 	bindParameter("approachDirectionGain", m_approachDirectionGain, "1.0");
 	bindParameter("approachDistanceGain", m_approachDistanceGain, "1.0");
 	bindParameter("poseTimeout", m_poseTimeout, "3.0");
+
+	bindParameter("group_name", m_group_name, "PathFollowerReps");
+	bindParameter("priority", m_priority, "1");
+		
 	// </rtc-template>
 
 	return RTC::RTC_OK;
