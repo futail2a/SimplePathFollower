@@ -53,6 +53,31 @@ class SimplePathFollower
   : public RTC::DataFlowComponentBase
 {
  public:
+
+	class ConnCB :RTC::ConnectionCallback {
+		private:
+			SimplePathFollower* m_ptr;
+		public:
+			ConnCB(SimplePathFollower* ptr){
+				m_ptr = ptr;
+			}
+			void operator()(RTC::ConnectorProfile& profile){
+				m_ptr->m_pathFollower.isDisconn(false);
+			}
+	};
+
+	class DisconnCB : RTC::ConnectionCallback{
+		private:
+			SimplePathFollower* m_ptr;
+		public:
+			DisconnCB(SimplePathFollower* ptr){
+				m_ptr = ptr;
+			}
+			void operator()(RTC::ConnectorProfile& profile){
+				m_ptr->m_pathFollower.isDisconn(false);
+			}
+	};
+
   /*!
    * @brief constructor
    * @param manager Maneger Object

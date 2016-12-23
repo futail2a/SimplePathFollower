@@ -52,7 +52,9 @@ RTC::RETURN_VALUE PathFollowerSVC_impl::followPath(const RTC::Path2D& path)
 			//	std::cout << "[RTC::SimplePathFollower] OutOfRange" << std::endl;
 			//	return RTC::RETVAL_OUTOF_RANGE;
 			}
-
+			if (m_isDisconn = true){
+				return RETVAL_UNKNOWN_ERROR;
+			}
 		}
 
 		std::cout << "[RTC::SimplePathFollower] Goal Reached." << std::endl;
