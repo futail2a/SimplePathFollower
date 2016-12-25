@@ -86,14 +86,12 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
 	m_PathFollowerPort.registerProvider("PathFollower", "RTC::PathFollower", m_pathFollower);
 	
 	RTC::ConnectionCallback* conn;
-	ConnCB ctmp(this);
-	conn = &ctmp;
+	conn = new SwitchConnectedMode(this);
 	m_PathFollowerPort.setOnConnected(conn);
 	
 
 	RTC::ConnectionCallback* disconn;
-	DisconnCB dtmp(this);
-	disconn = &dtmp;
+	disconn = new SwitchDisconnectedMode(this);
 	m_PathFollowerPort.setOnDisconnected(disconn);
 	
 	// Set service consumers to Ports

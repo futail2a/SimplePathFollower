@@ -54,29 +54,33 @@ class SimplePathFollower
 {
  public:
 
-	 class ConnCB : public RTC::ConnectionCallback {
+	 class SwitchConnectedMode : public RTC::ConnectionCallback {
 		private:
 			SimplePathFollower* m_ptr;
+
 		public:
-			ConnCB(SimplePathFollower* ptr){
+			SwitchConnectedMode(SimplePathFollower* ptr){
 				m_ptr = ptr;
 			}
+
 			void operator()(RTC::ConnectorProfile& profile){
 				std::cout << "connected" << std::endl;
-				m_ptr->m_pathFollower.isDisconn(false);
+				m_ptr->m_pathFollower.setIsConnected(true);
 			}
 	};
 
-	 class DisconnCB : public  RTC::ConnectionCallback{
+	 class SwitchDisconnectedMode : public  RTC::ConnectionCallback{
 		private:
 			SimplePathFollower* m_ptr;
+
 		public:
-			DisconnCB(SimplePathFollower* ptr){
+			SwitchDisconnectedMode(SimplePathFollower* ptr){
 				m_ptr = ptr;
 			}
+
 			void operator()(RTC::ConnectorProfile& profile){
 				std::cout << "disconnected" << std::endl;
-				m_ptr->m_pathFollower.isDisconn(true);
+				m_ptr->m_pathFollower.setIsConnected(false);
 			}
 	};
 
