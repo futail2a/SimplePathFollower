@@ -54,7 +54,7 @@ class SimplePathFollower
 {
  public:
 
-	class ConnCB :RTC::ConnectionCallback {
+	 class ConnCB : public RTC::ConnectionCallback {
 		private:
 			SimplePathFollower* m_ptr;
 		public:
@@ -62,11 +62,12 @@ class SimplePathFollower
 				m_ptr = ptr;
 			}
 			void operator()(RTC::ConnectorProfile& profile){
+				std::cout << "connected" << std::endl;
 				m_ptr->m_pathFollower.isDisconn(false);
 			}
 	};
 
-	class DisconnCB : RTC::ConnectionCallback{
+	 class DisconnCB : public  RTC::ConnectionCallback{
 		private:
 			SimplePathFollower* m_ptr;
 		public:
@@ -74,7 +75,8 @@ class SimplePathFollower
 				m_ptr = ptr;
 			}
 			void operator()(RTC::ConnectorProfile& profile){
-				m_ptr->m_pathFollower.isDisconn(false);
+				std::cout << "disconnected" << std::endl;
+				m_ptr->m_pathFollower.isDisconn(true);
 			}
 	};
 

@@ -84,14 +84,18 @@ RTC::ReturnCode_t SimplePathFollower::onInitialize()
 
 	// Set service provider to Ports
 	m_PathFollowerPort.registerProvider("PathFollower", "RTC::PathFollower", m_pathFollower);
+	
+	RTC::ConnectionCallback* conn;
+	ConnCB ctmp(this);
+	conn = &ctmp;
+	m_PathFollowerPort.setOnConnected(conn);
+	
 
-	RTC::ConnectionCallback* conn = new ConnCB(this);
-	m_PathFollowerPort.setOnDisconnected(conn);
-
-
-	RTC::ConnectionCallback* disconn = new DisconnCB(this);
+	RTC::ConnectionCallback* disconn;
+	DisconnCB dtmp(this);
+	disconn = &dtmp;
 	m_PathFollowerPort.setOnDisconnected(disconn);
-
+	
 	// Set service consumers to Ports
 
 	// Set CORBA Service Ports
