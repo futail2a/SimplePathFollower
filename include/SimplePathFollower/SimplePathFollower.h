@@ -53,37 +53,6 @@ class SimplePathFollower
   : public RTC::DataFlowComponentBase
 {
  public:
-
-	 class SwitchConnectedMode : public RTC::ConnectionCallback {
-		private:
-			SimplePathFollower* m_ptr;
-
-		public:
-			SwitchConnectedMode(SimplePathFollower* ptr){
-				m_ptr = ptr;
-			}
-
-			void operator()(RTC::ConnectorProfile& profile){
-				std::cout << "connected" << std::endl;
-				m_ptr->m_pathFollower.setIsConnected(true);
-			}
-	};
-
-	 class SwitchDisconnectedMode : public  RTC::ConnectionCallback{
-		private:
-			SimplePathFollower* m_ptr;
-
-		public:
-			SwitchDisconnectedMode(SimplePathFollower* ptr){
-				m_ptr = ptr;
-			}
-
-			void operator()(RTC::ConnectorProfile& profile){
-				std::cout << "disconnected" << std::endl;
-				m_ptr->m_pathFollower.setIsConnected(false);
-			}
-	};
-
   /*!
    * @brief constructor
    * @param manager Maneger Object

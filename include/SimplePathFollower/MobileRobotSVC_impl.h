@@ -29,10 +29,8 @@ class PathFollowerSVC_impl
    // destructor non-public
    //virtual ~PathFollowerSVC_impl();
 	 SimplePathFollower* m_pRTC;
-	 bool m_isConnected = false;
 
  public:
-	 void setIsConnected(bool b){ m_isConnected = b; }
   /*!
    * @brief standard constructor
    */
